@@ -10,6 +10,12 @@
 #include <iostream>
 #include <stdio.h>
 
+#include <iostream>
+#include <stdio.h>
+#include <cstdlib>
+#include <ctime>
+#include <iterator>
+
 #include "Slav.h"
 
 #define REPORT_ADAPTERS showMeAdapterSizes(queueOfSlavs,stackOfSlavs)
@@ -48,21 +54,48 @@ void containers(Slav * slavs, int n)
 	printf("## vector\n");
 
 	// Umieść Słowian w losowej kolejności w wektorze.
+	srand(time(NULL));
+	vectorOfSlavs.push_back(&slavs[0]);
+ 	for(int i=0; i<n; i++)
+ 	{
+ 		vectorOfSlavs.insert(vectorOfSlavs.begin() + rand()%(vectorOfSlavs.size()),&slavs[i]);	
+ 	};	 	  
+ 	vectorOfSlavs.pop_back();
+
 
 	// Wykorzystując iterator i funkcję description(), wyświetl wszystkich Słowian w wektorze
-
+	vector <Slav*>::iterator it_vectorOfSlavs; 
+	for(it_vectorOfSlavs=vectorOfSlavs.begin(); it_vectorOfSlavs!=vectorOfSlavs.end(); it_vectorOfSlavs++)
+ 		cout << (**it_vectorOfSlavs).description() << endl;
 	REPORT_CONTAINERS;
 	printf("## set\n");
 
+
 	// Przenieś wszystkich Słowian z wektoru do zbioru.
-	
+	for (int i=n-1; i>=0; i--)
+ 	{
+ 		setOfSlavs.insert(vectorOfSlavs[i]);
+ 		vectorOfSlavs.pop_back();
+ 	};
 	REPORT_CONTAINERS;
 	printf("## map\n");
 
+
 	// Stwórz słownik tworzący pary Słowian, z tych znajdujących się w zbiorze, czyszcząc zbiór
-	
+	set <Slav *>::iterator it_setOfSlavs = setOfSlavs.begin(), it_e_setOfSlavs = setOfSlavs.begin();
+	while(it_setOfSlavs != setOfSlavs.end())
+	{
+		mapOfSlavs[*it_setOfSlavs++] = *it_setOfSlavs++;
+		setOfSlavs.erase(it_e_setOfSlavs++);
+		setOfSlavs.erase(it_e_setOfSlavs++);
+	};
+
+
 	// Wykorzystując iterator, wyświetl wszystkie pary Słowian
-	
+	map <Slav *, Slav *>::iterator it_mapOfSlaves;
+	for(it_mapOfSlaves=mapOfSlavs.begin(); it_mapOfSlaves!=mapOfSlavs.end(); it_mapOfSlaves++)
+		cout << (*it_mapOfSlaves).first-> description() << "   " 
+		<< (*it_mapOfSlaves).second-> description() << endl;
 	REPORT_CONTAINERS;
 }
 
@@ -75,17 +108,31 @@ void adapters(Slav * slavs, int n)
 	REPORT_ADAPTERS;
 	printf("## queue\n");
 
+
 	// Umieść Słowian w kolejce.
-	
+	for(int i=0; i<n; i++)
+ 		queueOfSlavs.push(&slavs[i]);
 	REPORT_ADAPTERS;
 
 	printf("## stack\n");
-	// Przenieś Słowian z kolejki do stosu.
 
-	REPORT_ADAPTERS;
+
+	// Przenieś Słowian z kolejki do stosu.
+	while(!queueOfSlavs.empty())
+ 	{
+ 		stackOfSlavs.push(queueOfSlavs.front());
+ 		queueOfSlavs.pop();
+ 	}
+ 	REPORT_ADAPTERS;
+
 
 	// Wyświetl Słowian zdejmowanych ze stosu.
-
+ 	while(!stackOfSlavs.empty())
+	{
+		cout<<stackOfSlavs.top()->description() << endl;
+		stackOfSlavs.pop();
+	}
+	cout<<endl;
 	REPORT_ADAPTERS;
 }
 
